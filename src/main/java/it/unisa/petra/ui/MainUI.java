@@ -437,9 +437,9 @@ public class MainUI extends JDialog {
                 int progress;
                 int trials = 0;
                 BufferedWriter seedsWriter = null;
-
+                System.out.println("trying to get appName...");
                 appName = process.extractAppName(apkLocationPath);
-
+                System.out.println("appName Retrieved");
                 String outputLocationPath = new File(apkLocationPath).getParent() + File.separator + "test_data" + File.separator + appName;
 
                 File appDataFolder = new File(outputLocationPath);
@@ -454,7 +454,7 @@ public class MainUI extends JDialog {
 
                 if (this.powerProfilePath.isEmpty()) {
                     process.extractPowerProfile(outputLocationPath);
-                    this.powerProfilePath = outputLocationPath + "/power_profile.xml";
+                    this.powerProfilePath = outputLocationPath + "\\power_profile.xml";
                 }
 
                 int timeCapturing = (interactions * timeBetweenInteractions) / 1000;

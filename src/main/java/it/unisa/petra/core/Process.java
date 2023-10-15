@@ -25,7 +25,8 @@ public class Process {
 
     public void installApp(String apkLocation) throws NoDeviceFoundException, ADBNotFoundException {
 
-        this.checkADBExists();
+        // Lets see if commenting this out fixes my problem!
+        //this.checkADBExists();
 
         this.executeCommand("adb shell dumpsys battery set ac 0", null);
         this.executeCommand("adb shell dumpsys battery set usb 0", null);
@@ -58,7 +59,7 @@ public class Process {
         if (scriptLocationPath.isEmpty()) {
             System.out.println("Run " + run + ": seed: " + seed);
         }
-        String runDataFolderName = outputLocation + "/run_" + run + File.separator;
+        String runDataFolderName = outputLocation + "\\run_" + run + File.separator;
         File runDataFolder = new File(runDataFolderName);
 
         runDataFolder.mkdirs();
@@ -112,17 +113,17 @@ public class Process {
 
     public void extractPowerProfile(String outputLocation) throws NoDeviceFoundException {
         System.out.println("Extracting power profile.");
-        String jarDirectory = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getPath();
+        String jarDirectoryTemp = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getPath();
+        String jarDirectory = jarDirectoryTemp.replace("/","\\");
+        this.executeCommand("adb pull \\system\\framework\\framework-res.apk", null);
 
-        this.executeCommand("adb pull /system/framework/framework-res.apk", null);
-
-        this.executeCommand("jar xf " + jarDirectory + "/PETrA.jar apktool_2.2.2.jar", null);
+        this.executeCommand("jar xf " + jarDirectory + "\\PETrA.jar apktool_2.2.2.jar", null);
         this.executeCommand("java -jar apktool_2.2.2.jar if framework-res.apk", null);
         this.executeCommand("java -jar apktool_2.2.2.jar d framework-res.apk", null);
-        this.executeCommand("mv " + jarDirectory + "/framework-res/res/xml/power_profile.xml " + outputLocation, null);
-        this.executeCommand("rm -rf " + jarDirectory + "/apktool_2.2.2.jar", null);
-        this.executeCommand("rm -rf " + jarDirectory + "/framework-res.apk", null);
-        this.executeCommand("rm -rf " + jarDirectory + "/framework-res", null);
+        this.executeCommand("move " + jarDirectory + "\\framework-res\\res\\xml\\power_profile.xml " + outputLocation, null);
+        this.executeCommand("del " + jarDirectory + "\\apktool_2.2.2.jar", null);
+        this.executeCommand("del " + jarDirectory + "\\framework-res.apk", null);
+        this.executeCommand("del " + jarDirectory + "\\framework-res", null);
     }
 
     private void resetApp(String appName, int run) throws NoDeviceFoundException {
@@ -134,7 +135,7 @@ public class Process {
     private SysTraceRunner startProfiling(String appName, int run, int timeCapturing, String systraceFilename,
                                           String platformToolsFolder) throws NoDeviceFoundException {
         System.out.println("Run " + run + ": starting profiling.");
-        this.executeCommand("adb shell am profile start " + appName + " ./data/local/tmp/log.trace", null);
+        this.executeCommand("adb shell am profile start " + appName + " .\\data\\local\\tmp\\log.trace", null);
 
         System.out.println("Run " + run + ": capturing system traces.");
         return new SysTraceRunner(timeCapturing, systraceFilename, platformToolsFolder);
@@ -148,9 +149,9 @@ public class Process {
         } else {
             System.out.println("Run " + run + ": running monkeyrunner script.");
             String jarDirectory = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getPath();
-            this.executeCommand("jar xf " + jarDirectory + "/PETrA.jar monkey_playback.py", null);
-            this.executeCommand(toolsFolder + "/bin/monkeyrunner " + jarDirectory + "/monkey_playback.py " + scriptLocationPath, null);
-            this.executeCommand("rm -rf " + jarDirectory + "/monkey_playback.py", null);
+            this.executeCommand("jar xf " + jarDirectory + "\\PETrA.jar monkey_playback.py", null);
+            this.executeCommand(toolsFolder + "\\bin\\monkeyrunner " + jarDirectory + "\\monkey_playback.py " + scriptLocationPath, null);
+            this.executeCommand("rm -rf " + jarDirectory + "\\monkey_playback.py", null);
         }
     }
 
@@ -162,8 +163,8 @@ public class Process {
         this.executeCommand("adb shell dumpsys batterystats", new File(batteryStatsFilename));
 
         System.out.println("Run " + run + ": saving traceviews.");
-        this.executeCommand("adb pull ./data/local/tmp/log.trace " + runDataFolderName, null);
-        this.executeCommand(platformToolsFolder + "/dmtracedump -o " + runDataFolderName + "log.trace", new File(traceviewFilename));
+        this.executeCommand("adb pull .\\data\\local\\tmp\\log.trace " + runDataFolderName, null);
+        this.executeCommand(platformToolsFolder + "\\dmtracedump -o " + runDataFolderName + "log.trace", new File(traceviewFilename));
 
     }
 
@@ -353,7 +354,7 @@ public class Process {
 
     private void checkADBExists() throws ADBNotFoundException {
         String sdkFolderPath = System.getenv("ANDROID_HOME");
-        String adbPath = sdkFolderPath + "/platform-tools/adb";
+        String adbPath = sdkFolderPath + "\\platform-tools\\adb.exe";
         File adbFile = new File(adbPath);
         if (!adbFile.exists()) {
             throw new ADBNotFoundException();
@@ -361,9 +362,14 @@ public class Process {
     }
 
     public String extractAppName(String apkLocationPath) throws NoDeviceFoundException, AppNameCannotBeExtractedException {
+        System.out.println("Printing recieved apkLocationPath...");
+        System.out.println(apkLocationPath);
         String sdkFolderPath = System.getenv("ANDROID_HOME");
-        String aaptPath = sdkFolderPath + "/build-tools/25.0.3/aapt";
+        System.out.println(sdkFolderPath);
+        String aaptPath = sdkFolderPath + "\\build-tools\\34.0.0\\aapt";
+        System.out.println(aaptPath);
         String aaptOutput = this.executeCommand(aaptPath + " dump badging " + apkLocationPath, null);
+        System.out.println(aaptOutput);
         String appName = "";
         Pattern pattern = Pattern.compile("package: name='([^']*)' versionCode='[^']*' versionName='[^']*' platformBuildVersionName='[^']*'");
 

@@ -41,7 +41,7 @@ class SysTraceRunner implements Runnable {
 
     @Override
     public void run() {
-        String command = "python " + platformToolsFolder + "/systrace/systrace.py --time=" + this.timeCapturing + " freq idle -o " + this.systraceFilename;
+        String command = "python " + platformToolsFolder + "\\systrace\\systrace.py --time=" + this.timeCapturing + " freq idle -o " + this.systraceFilename;
 
         SysTraceRunner.executeCommand(command);
     }

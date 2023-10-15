@@ -29,6 +29,7 @@ public class Terminal {
             appDataFolder.delete();
             appDataFolder.mkdirs();
 
+            System.out.println("in the Terminal.java now, lets see if this prints!!!!");
             String appName = process.extractAppName(configManager.getApkLocationPath());
 
             if (configManager.getScriptLocationPath().isEmpty()) {
@@ -46,7 +47,7 @@ public class Terminal {
 
             if (powerProfilePath.isEmpty()) {
                 process.extractPowerProfile(configManager.getOutputLocation());
-                powerProfilePath = configManager.getOutputLocation() + "/power_profile.xml";
+                powerProfilePath = configManager.getOutputLocation() + "\\power_profile.xml";
             }
 
             int timeCapturing = (configManager.getInteractions() * configManager.getTimeBetweenInteractions()) / 1000;
