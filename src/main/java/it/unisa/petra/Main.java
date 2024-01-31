@@ -5,6 +5,7 @@ import it.unisa.petra.ui.MainUI;
 
 /**
  * @author dardin88
+ * Last modification @date
  */
 class Main {
 
